@@ -66,3 +66,88 @@ impl_pointer_sized!(extern "C" fn);
 impl_pointer_sized!(unsafe extern "C" fn);
 impl_pointer_sized!(extern "system" fn);
 impl_pointer_sized!(unsafe extern "system" fn);
+
+#[cfg(test)]
+mod unittest {
+    use std::ffi;
+
+    use crate::PointerSized;
+
+    pub const fn assert_pointer_sized<T: PointerSized>() {}
+
+    #[test]
+    pub fn const_raw_pointer_marked_as_pointer_sized() {
+        assert_pointer_sized::<*const ffi::c_void>();
+    }
+
+    #[test]
+    pub fn mut_raw_pointer_marked_as_pointer_sized() {
+        assert_pointer_sized::<*mut ffi::c_void>();
+    }
+
+    #[test]
+    pub fn functions_marked_as_pointer_sized() {
+        assert_pointer_sized::<fn()>();
+        assert_pointer_sized::<fn() -> i32>();
+        assert_pointer_sized::<fn(i32) -> i32>();
+        assert_pointer_sized::<fn(i32, i32) -> i32>();
+        assert_pointer_sized::<fn(i32, i32, i32) -> i32>();
+        assert_pointer_sized::<fn(i32, i32, i32, i32) -> i32>();
+        assert_pointer_sized::<fn(i32, i32, i32, i32, i32) -> i32>();
+        assert_pointer_sized::<fn(i32, i32, i32, i32, i32, i32) -> i32>();
+    }
+
+    #[test]
+    pub fn c_abi_functions_marked_as_pointer_sized() {
+        assert_pointer_sized::<extern "C" fn()>();
+        assert_pointer_sized::<unsafe extern "C" fn()>();
+
+        assert_pointer_sized::<extern "C" fn() -> i32>();
+        assert_pointer_sized::<unsafe extern "C" fn() -> i32>();
+
+        assert_pointer_sized::<extern "C" fn(i32) -> i32>();
+        assert_pointer_sized::<unsafe extern "C" fn(i32) -> i32>();
+
+        assert_pointer_sized::<extern "C" fn(i32, i32) -> i32>();
+        assert_pointer_sized::<unsafe extern "C" fn(i32, i32) -> i32>();
+
+        assert_pointer_sized::<extern "C" fn(i32, i32, i32) -> i32>();
+        assert_pointer_sized::<unsafe extern "C" fn(i32, i32, i32) -> i32>();
+
+        assert_pointer_sized::<extern "C" fn(i32, i32, i32, i32) -> i32>();
+        assert_pointer_sized::<unsafe extern "C" fn(i32, i32, i32, i32) -> i32>();
+
+        assert_pointer_sized::<extern "C" fn(i32, i32, i32, i32, i32) -> i32>();
+        assert_pointer_sized::<unsafe extern "C" fn(i32, i32, i32, i32, i32) -> i32>();
+
+        assert_pointer_sized::<extern "C" fn(i32, i32, i32, i32, i32, i32) -> i32>();
+        assert_pointer_sized::<unsafe extern "C" fn(i32, i32, i32, i32, i32, i32) -> i32>();
+    }
+
+    #[test]
+    pub fn system_abi_functions_marked_as_pointer_sized() {
+        assert_pointer_sized::<extern "system" fn()>();
+        assert_pointer_sized::<unsafe extern "system" fn()>();
+
+        assert_pointer_sized::<extern "system" fn() -> i32>();
+        assert_pointer_sized::<unsafe extern "system" fn() -> i32>();
+
+        assert_pointer_sized::<extern "system" fn(i32) -> i32>();
+        assert_pointer_sized::<unsafe extern "system" fn(i32) -> i32>();
+
+        assert_pointer_sized::<extern "system" fn(i32, i32) -> i32>();
+        assert_pointer_sized::<unsafe extern "system" fn(i32, i32) -> i32>();
+
+        assert_pointer_sized::<extern "system" fn(i32, i32, i32) -> i32>();
+        assert_pointer_sized::<unsafe extern "system" fn(i32, i32, i32) -> i32>();
+
+        assert_pointer_sized::<extern "system" fn(i32, i32, i32, i32) -> i32>();
+        assert_pointer_sized::<unsafe extern "system" fn(i32, i32, i32, i32) -> i32>();
+
+        assert_pointer_sized::<extern "system" fn(i32, i32, i32, i32, i32) -> i32>();
+        assert_pointer_sized::<unsafe extern "system" fn(i32, i32, i32, i32, i32) -> i32>();
+
+        assert_pointer_sized::<extern "system" fn(i32, i32, i32, i32, i32, i32) -> i32>();
+        assert_pointer_sized::<unsafe extern "system" fn(i32, i32, i32, i32, i32, i32) -> i32>();
+    }
+}
