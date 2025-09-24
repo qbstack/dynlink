@@ -42,3 +42,65 @@ impl<'symtab, T: PointerSized> fmt::Debug for PosixSymbol<'symtab, T> {
         f.write_fmt(format_args!("PosixSymbol({:p})", self.0))
     }
 }
+
+#[cfg(test)]
+mod unittest {
+    use std::{ffi, marker};
+
+    use crate::symtab::PosixSymbol;
+
+    pub fn assert_send<T: Send>() {}
+    pub fn assert_sync<T: Sync>() {}
+
+    pub fn sum(a: i32, b: i32) -> i32 {
+        a + b
+    }
+
+    #[test]
+    pub fn posix_symbol_marked_as_send_test() {
+        assert_send::<PosixSymbol<'_, fn(i32, i32) -> i32>>();
+    }
+
+    #[test]
+    pub fn posix_symbol_marked_as_sync_test() {
+        assert_sync::<PosixSymbol<'_, fn(i32, i32) -> i32>>();
+    }
+
+    #[test]
+    pub fn posix_symbol_applies_as_type_it_represents_test() {
+        unsafe {
+            let symbol: PosixSymbol<'_, fn(i32, i32) -> i32> =
+                PosixSymbol(sum as *mut ffi::c_void, marker::PhantomData);
+
+            assert_eq!(2, symbol.apply(|it| it(1, 1)));
+        }
+    }
+
+    #[test]
+    pub fn posix_symbol_leaks_as_type_it_reprensents_test() {
+        unsafe {
+            let symbol: PosixSymbol<'_, fn(i32, i32) -> i32> =
+                PosixSymbol(sum as *mut ffi::c_void, marker::PhantomData);
+
+            let sum_fn = symbol.leak();
+            assert_eq!(2, sum_fn(1, 1));
+        }
+
+        unsafe {
+            let symbol: PosixSymbol<'_, *mut ffi::c_void> =
+                PosixSymbol(sum as *mut ffi::c_void, marker::PhantomData);
+
+            assert_eq!(sum as *mut ffi::c_void, symbol.leak());
+        }
+    }
+
+    #[test]
+    pub fn posix_symbol_leaks_as_raw_ptr_test() {
+        unsafe {
+            let symbol: PosixSymbol<'_, fn(i32, i32) -> i32> =
+                PosixSymbol(sum as *mut ffi::c_void, marker::PhantomData);
+
+            assert_eq!(sum as *mut ffi::c_void, symbol.leak_as_raw());
+        }
+    }
+}
