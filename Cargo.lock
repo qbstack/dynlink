@@ -5,3 +5,7 @@ version = 4
 [[package]]
 name = "dynlink"
 version = "0.0.0"
+
+[[package]]
+name = "pointersized"
+version = "0.0.0"
