@@ -12,3 +12,4 @@ edition = { workspace = true }
 
 [dependencies]
 pointersized = { workspace = true }
+libc = { workspace = true }

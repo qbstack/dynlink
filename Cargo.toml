@@ -22,3 +22,6 @@ opt-level = 3
 [workspace.dependencies]
 pointersized = { path = "pointersized" }
 dynlink-posix = { path = "dynlink-posix" }
+
+# Posix backend dependencies
+libc = { version = "0.2" }
