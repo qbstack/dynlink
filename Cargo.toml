@@ -11,7 +11,7 @@ edition = "2021"
 
 [workspace]
 resolver = "3"
-members = ["dynlink", "pointersized"]
+members = ["dynlink", "dynlink-posix", "pointersized"]
 
 [profile.dev]
 opt-level = 1
@@ -21,3 +21,4 @@ opt-level = 3
 
 [workspace.dependencies]
 pointersized = { path = "pointersized" }
+dynlink-posix = { path = "dynlink-posix" }

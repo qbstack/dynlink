@@ -7,5 +7,9 @@ name = "dynlink"
 version = "0.0.0"
 
 [[package]]
+name = "dynlink-posix"
+version = "0.0.0"
+
+[[package]]
 name = "pointersized"
 version = "0.0.0"
