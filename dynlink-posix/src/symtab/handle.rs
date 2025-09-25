@@ -159,3 +159,21 @@ impl fmt::Debug for PosixHandle {
         f.write_fmt(format_args!("PosixHandle({:p})", self.0))
     }
 }
+
+#[cfg(test)]
+mod unittest {
+    use crate::symtab::PosixHandle;
+
+    pub fn assert_send<T: Send>() {}
+    pub fn assert_sync<T: Sync>() {}
+
+    #[test]
+    pub fn posix_handle_marked_as_send_test() {
+        assert_send::<PosixHandle>();
+    }
+
+    #[test]
+    pub fn posix_handle_marked_as_sync_test() {
+        assert_sync::<PosixHandle>();
+    }
+}
