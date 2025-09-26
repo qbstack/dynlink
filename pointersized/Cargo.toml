@@ -1,0 +1,13 @@
+[package]
+name = "pointersized"
+version = { workspace = true }
+description = "Marking of pointer-sized types"
+keywords = { workspace = true }
+authors = { workspace = true }
+license = { workspace = true }
+readme = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+edition = { workspace = true }
+
+[dependencies]

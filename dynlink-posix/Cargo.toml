@@ -1,0 +1,15 @@
+[package]
+name = "dynlink-posix"
+version = { workspace = true }
+description = "Cross-platform dynamic linking. Posix backend"
+keywords = { workspace = true }
+authors = { workspace = true }
+license = { workspace = true }
+readme = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+edition = { workspace = true }
+
+[dependencies]
+pointersized = { workspace = true }
+libc = { workspace = true }

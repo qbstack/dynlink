@@ -11,10 +11,17 @@ edition = "2021"
 
 [workspace]
 resolver = "3"
-members = ["dynlink"]
+members = ["dynlink", "dynlink-posix", "pointersized"]
 
 [profile.dev]
 opt-level = 1
 
 [profile.release]
 opt-level = 3
+
+[workspace.dependencies]
+pointersized = { path = "pointersized" }
+dynlink-posix = { path = "dynlink-posix" }
+
+# Posix backend dependencies
+libc = { version = "0.2" }

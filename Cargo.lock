@@ -5,3 +5,21 @@ version = 4
 [[package]]
 name = "dynlink"
 version = "0.0.0"
+
+[[package]]
+name = "dynlink-posix"
+version = "0.0.0"
+dependencies = [
+ "libc",
+ "pointersized",
+]
+
+[[package]]
+name = "libc"
+version = "0.2.176"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "58f929b4d672ea937a23a1ab494143d968337a5f47e56d0815df1e0890ddf174"
+
+[[package]]
+name = "pointersized"
+version = "0.0.0"
