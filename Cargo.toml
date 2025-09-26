@@ -26,3 +26,6 @@ dynlink-win32 = { path = "dynlink-win32" }
 
 # Posix backend dependencies
 libc = { version = "0.2" }
+
+# Win32 backend dependencies
+windows-sys = { version = "0.61" }
