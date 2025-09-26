@@ -1,5 +1,24 @@
 use std::ffi;
 
+/// Pointer-sized types marker.
+///
+/// This trait is implemented for opaque c-pointers and functions.
+///
+/// # Example
+///
+/// ```no_run
+/// use std::ffi;
+///
+/// use pointersized::PointerSized;
+///
+/// fn assert_pointer_sized<T: PointerSized>() {}
+///
+/// fn main() {
+///     assert_pointer_sized::<*const ffi::c_void>();
+///     assert_pointer_sized::<*mut ffi::c_void>();
+///     assert_pointer_sized::<fn(i32, i32) -> i32>();
+/// }
+/// ```
 pub trait PointerSized {}
 
 impl PointerSized for *const ffi::c_void {}
