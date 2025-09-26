@@ -17,6 +17,9 @@ dependencies = [
 [[package]]
 name = "dynlink-win32"
 version = "0.0.0"
+dependencies = [
+ "pointersized",
+]
 
 [[package]]
 name = "libc"
