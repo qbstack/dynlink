@@ -1,3 +1,8 @@
+//! POSIX dynamic linking.
+//!
+//! This library binds around <dlfcn.h> and provides a more memory-safe API
+//! that allows dynamic linking shared objects, and use the data and functions they contains.
+
 #[cfg(any(
     target_os = "linux",
     target_os = "android",

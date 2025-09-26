@@ -4,14 +4,59 @@ use pointersized::PointerSized;
 
 use crate::symtab::PosixSymbol;
 
+/// Lazy symbol resolution option.
+///
+/// Relocations will be performed at an implementation-defined time, ranging from the time
+/// of the `PosixHandle::openc` call until the first reference to a given symbol occurs.
+///
+/// Specifying `RTLD_LAZY` should improve performance on implementations supporting dynamic
+/// symbol binding since a process might not reference all of the symbols in a symbol table.
+/// And, for systems supporting dynamic symbol resolution for normal process execution,
+/// this behavior mimics the normal handling of process execution.
+///
+/// # Notes
+///
+/// Conflicts with `RTLD_NOW`.
 pub const RTLD_LAZY: ffi::c_int = libc::RTLD_LAZY;
+
+/// Eager symbol resolution option.
+///
+/// All necessary relocations will be performed when the symbol table is first loaded.
+///
+/// This may waste some processing if relocations are performed for symbols that are never referenced.
+/// This behavior may be useful for applications that need to know that all symbols referenced
+/// during execution will be available before `PosixHandle::openc` returns.
+///
+/// # Notes
+///
+/// Conflicts with `RTLD_LAZY`.
 pub const RTLD_NOW: ffi::c_int = libc::RTLD_NOW;
+
+/// Global symbol visibility.
+///
+/// The shared object file's symbols will be made available for relocation processing
+/// of any other executable object file.
+///
+/// # Notes
+///
+/// Conflicts with `RTLD_LOCAL`.
 pub const RTLD_GLOBAL: ffi::c_int = libc::RTLD_GLOBAL;
+
+/// Local symbol visibility.
+///
+/// The shared object file's symbols will not be made available for relocation processing
+/// of any other executable object file.
+///
+/// # Notes
+///
+/// Conflicts with: `RTLD_GLOBAL`.
 pub const RTLD_LOCAL: ffi::c_int = libc::RTLD_LOCAL;
 
+/// Represents a system message with diagnostic information.
 pub struct PosixSystemMessage(pub(super) ffi::CString);
 
 impl PosixSystemMessage {
+    /// Creates owned message cloned from c-str.
     pub(super) fn clone_from_str(msg: &ffi::CStr) -> Self {
         Self(msg.to_owned())
     }
@@ -35,16 +80,19 @@ impl fmt::Display for PosixSystemMessage {
     }
 }
 
+/// Represents an error that occurred during dynamic linking processing.
 pub enum PosixLinkingError {
     System(PosixSystemMessage),
     Unknown,
 }
 
 impl PosixLinkingError {
+    /// Creates owned error cloned from c-str.
     pub(super) fn clone_from_str(msg: &ffi::CStr) -> Self {
         Self::System(PosixSystemMessage::clone_from_str(msg))
     }
 
+    /// Creates owned error cloned from raw c-str pointer.
     pub(super) unsafe fn clone_from_ptr(msg: *const ffi::c_char) -> Self {
         if !msg.is_null() {
             Self::clone_from_str(ffi::CStr::from_ptr(msg))
@@ -86,9 +134,52 @@ impl fmt::Display for PosixLinkingError {
 
 impl error::Error for PosixLinkingError {}
 
+/// Represents an opaque handle of a shared object file's symbol table.
+///
+/// # Usage
+///
+/// `PosixHandle` is used to symbol lookup.
+///
+/// ```no_run
+/// use dynlink_posix::symtab::{PosixHandle, PosixSymbol, RTLD_LAZY, RTLD_LOCAL};
+///
+/// // sum.c
+/// //
+/// // int sum_of(int a, int b) {
+/// //    return a + b;
+/// // }
+///
+/// fn main() {
+///     unsafe {
+///         let handle = PosixHandle::openc(c"libsum.so", RTLD_LOCAL | RTLD_LAZY)
+///             .expect("libsum handle was not opened");
+///
+///         let symbol = handle.lookupc::<extern "C" fn(i32, i32) -> i32>(c"sum_of")
+///             .expect("sum_of symbol was not found");
+///
+///         let _ = handle.lookupc::<extern "C" fn(i32, i32) -> i32>(c"unknown")
+///             .expect_err("unknown symbol was found");
+///     }
+/// }
+/// ```
+///
+/// # Safety
+///
+/// Shared object initialization routines that are executed when a
+/// `PosixHandle::openc` is called may contain undefined behavior (UB).
+///
+/// The thread-safety of `PosixHandle` depends on the `dlfcn` implementation.
+/// It is thread-safe only if the implementations of `dlopen`, `dlsym`, `dlclose`, and `dlerror` are thread-safe.
 pub struct PosixHandle(pub(super) *mut ffi::c_void);
 
 impl PosixHandle {
+    /// Opens shared object file specified by null-terminated `path` and loads it into the process address
+    /// space according to `options` and returns an owned handle.
+    ///
+    /// # Safety
+    ///
+    /// Shared object initialization routines that are executed when this
+    /// function is called may be UB.
     pub unsafe fn openc(path: &ffi::CStr, options: ffi::c_int) -> Result<Self, PosixLinkingError> {
         #[cfg(target_os = "freebsd")]
         let _ = libc::dlerror();
@@ -103,6 +194,11 @@ impl PosixHandle {
         }
     }
 
+    /// Looks up a symbol from the shared object file's symbol table by null-terminated name.
+    ///
+    /// # Safety
+    ///
+    /// Type `T` must be ABI compatible with the type of symbol from the shared object.
     pub unsafe fn lookupc<T: PointerSized>(
         &self,
         symbol: &ffi::CStr,
