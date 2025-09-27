@@ -156,3 +156,21 @@ impl fmt::Debug for Win32Handle {
         f.write_fmt(format_args!("Win32Handle({:p})", self.0))
     }
 }
+
+#[cfg(test)]
+mod unittest {
+    use crate::symtab::Win32Handle;
+
+    pub fn assert_send<T: Send>() {}
+    pub fn assert_sync<T: Sync>() {}
+
+    #[test]
+    pub fn win32_handle_marked_as_send_test() {
+        assert_send::<Win32Handle>();
+    }
+
+    #[test]
+    pub fn win32_handle_marked_as_sync_test() {
+        assert_sync::<Win32Handle>();
+    }
+}
