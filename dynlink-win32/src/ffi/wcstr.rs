@@ -167,3 +167,79 @@ const unsafe fn strlen(data: *const u16) -> usize {
         len += 1
     }
 }
+
+#[cfg(test)]
+mod unittest {
+    use crate::ffi::WCStr;
+
+    #[test]
+    pub fn wcstr_wraps_from_wide_until_nul_when_data_contains_nul_test() {
+        let data = &[1u16, 1, 1, 0, 1, 1];
+
+        let wcstr =
+            WCStr::from_wide_until_nul(data).expect("Data with nul was not wrapped with WCStr");
+
+        assert_eq!(&[1u16, 1, 1, 0], &wcstr.0);
+    }
+
+    #[test]
+    pub fn wcstr_fails_to_wrap_from_wide_until_nul_when_data_does_not_contains_nul_test() {
+        let data = &[1u16, 1, 1, 1, 1, 1];
+
+        let _ =
+            WCStr::from_wide_until_nul(data).expect_err("Data without nul was wrapped with WCStr");
+    }
+
+    #[test]
+    pub fn wcstr_wraps_from_wide_with_nul_when_data_contains_last_nul_test() {
+        let data = &[1u16, 1, 1, 1, 1, 0];
+
+        let wcstr =
+            WCStr::from_wide_with_nul(data).expect("Data with last nul was not wrapped with WCStr");
+
+        assert_eq!(&[1u16, 1, 1, 1, 1, 0], &wcstr.0);
+    }
+
+    #[test]
+    pub fn wcstr_fails_to_wrap_from_wide_with_nul_when_data_does_not_contains_nul_test() {
+        let data = &[1u16, 1, 1, 1, 1, 1];
+
+        let _ =
+            WCStr::from_wide_with_nul(data).expect_err("Data without nul was wrapped with WCStr");
+    }
+
+    #[test]
+    pub fn wcstr_fails_to_wrap_from_wide_with_nul_when_data_contains_interior_nul_test() {
+        let data = &[1u16, 1, 1, 0, 1, 1];
+
+        let _ = WCStr::from_wide_with_nul(data)
+            .expect_err("Data with interior nul was wrapped with WCStr");
+    }
+
+    #[test]
+    pub fn wcstr_wraps_from_ptr_when_data_contains_nul_test() {
+        let data = &[1u16, 1, 1, 1, 1, 0];
+
+        let wcstr = unsafe { WCStr::from_ptr(data as *const u16) };
+
+        assert_eq!(&[1u16, 1, 1, 1, 1, 0], &wcstr.0)
+    }
+
+    #[test]
+    pub fn wcstr_to_wide_returns_slice_without_last_nul_test() {
+        let data = &[1u16, 1, 1, 1, 1, 0];
+
+        let wcstr = unsafe { WCStr::from_wide_with_nul_unchecked(data) };
+
+        assert_eq!(&[1u16, 1, 1, 1, 1], wcstr.to_wide());
+    }
+
+    #[test]
+    pub fn wcstr_to_wide_with_nul_returns_slice_with_last_nul_test() {
+        let data = &[1u16, 1, 1, 1, 1, 0];
+
+        let wcstr = unsafe { WCStr::from_wide_with_nul_unchecked(data) };
+
+        assert_eq!(&[1u16, 1, 1, 1, 1, 0], wcstr.to_wide_with_nul());
+    }
+}
