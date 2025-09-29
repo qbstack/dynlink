@@ -142,6 +142,31 @@ impl error::Error for PosixLinkingError {}
 /// `PosixHandle` is used to symbol lookup.
 ///
 /// ```no_run
+/// use dynlink_posix::symtab::{PosixHandle, PosixSymbol};
+///
+/// // sum.c
+/// //
+/// // int sum_of(int a, int b) {
+/// //    return a + b;
+/// // }
+///
+/// fn main() {
+///     unsafe {
+///         let handle = PosixHandle::open("libsum.so")
+///             .expect("libsum handle was not opened");
+///
+///         let symbol = handle.lookup::<extern "C" fn(i32, i32) -> i32>("sum_of")
+///             .expect("sum_of symbol was not found");
+///
+///         let _ = handle.lookup::<extern "C" fn(i32, i32) -> i32>("unknown")
+///             .expect_err("unknown symbol was found");
+///     }
+/// }
+/// ```
+///
+/// Options of symbol resolution and visibility can be specified if necessary.
+///
+/// ```no_run
 /// use dynlink_posix::symtab::{PosixHandle, PosixSymbol, RTLD_LAZY, RTLD_LOCAL};
 ///
 /// // sum.c
@@ -152,14 +177,8 @@ impl error::Error for PosixLinkingError {}
 ///
 /// fn main() {
 ///     unsafe {
-///         let handle = PosixHandle::openc(c"libsum.so", RTLD_LOCAL | RTLD_LAZY)
+///         let _ = PosixHandle::openc(c"libsum.so", RTLD_LOCAL | RTLD_LAZY)
 ///             .expect("libsum handle was not opened");
-///
-///         let symbol = handle.lookupc::<extern "C" fn(i32, i32) -> i32>(c"sum_of")
-///             .expect("sum_of symbol was not found");
-///
-///         let _ = handle.lookupc::<extern "C" fn(i32, i32) -> i32>(c"unknown")
-///             .expect_err("unknown symbol was found");
 ///     }
 /// }
 /// ```
@@ -167,13 +186,21 @@ impl error::Error for PosixLinkingError {}
 /// # Safety
 ///
 /// Shared object initialization routines that are executed when a
-/// `PosixHandle::openc` is called may contain undefined behavior (UB).
+/// `PosixHandle::open` or `PosixHandle::openc` is called may contain
+/// undefined behavior (UB).
 ///
 /// The thread-safety of `PosixHandle` depends on the `dlfcn` implementation.
 /// It is thread-safe only if the implementations of `dlopen`, `dlsym`, `dlclose`, and `dlerror` are thread-safe.
 pub struct PosixHandle(pub(super) *mut ffi::c_void);
 
 impl PosixHandle {
+    /// Opens shared object file specified by `path` with default options and loads
+    /// it into the process address space and returns an owned handle.
+    ///
+    /// # Safety
+    ///
+    /// Shared object initialization routines that are executed when this
+    /// function is called may be UB.
     pub unsafe fn open(path: impl AsRef<ffi::OsStr>) -> Result<Self, PosixLinkingError> {
         let path_bytes = path.as_ref().as_bytes();
         let options = RTLD_LAZY | RTLD_LOCAL;
@@ -214,6 +241,11 @@ impl PosixHandle {
         }
     }
 
+    /// Looks up a symbol from the shared object file's symbol table by name.
+    ///
+    /// # Safety
+    ///
+    /// Type `T` must be ABI compatible with the type of symbol from the shared object.
     pub unsafe fn lookup<T: pointersized::PointerSized>(
         &self,
         symbol: &str,
