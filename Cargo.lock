@@ -20,6 +20,7 @@ name = "dynlink-win32"
 version = "0.0.0"
 dependencies = [
  "pointersized",
+ "smallvec",
  "windows-sys",
 ]
 
