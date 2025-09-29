@@ -6,6 +6,8 @@ version = 4
 name = "dynlink"
 version = "0.0.0"
 dependencies = [
+ "dynlink-posix",
+ "dynlink-win32",
  "pointersized",
 ]
 
