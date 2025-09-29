@@ -1,6 +1,7 @@
-use std::{error, ffi, fmt};
+use std::{error, ffi, fmt, os::unix::ffi::OsStrExt};
 
 use pointersized::PointerSized;
+use smallvec;
 
 use crate::symtab::PosixSymbol;
 
@@ -173,6 +174,25 @@ impl error::Error for PosixLinkingError {}
 pub struct PosixHandle(pub(super) *mut ffi::c_void);
 
 impl PosixHandle {
+    pub unsafe fn open(path: impl AsRef<ffi::OsStr>) -> Result<Self, PosixLinkingError> {
+        let path_bytes = path.as_ref().as_bytes();
+        let options = RTLD_LAZY | RTLD_LOCAL;
+
+        match ffi::CStr::from_bytes_until_nul(path_bytes) {
+            Ok(cpath) => Self::openc(cpath, options),
+            Err(_) => {
+                const PATH_ESTIMATED_MAX_LEN: usize = 4096;
+
+                let mut buf =
+                    smallvec::SmallVec::<[u8; PATH_ESTIMATED_MAX_LEN]>::from_slice(path_bytes);
+                buf.push(0);
+
+                let cpath = unsafe { ffi::CStr::from_bytes_with_nul_unchecked(&buf) };
+                Self::openc(cpath, options)
+            }
+        }
+    }
+
     /// Opens shared object file specified by null-terminated `path` and loads it into the process address
     /// space according to `options` and returns an owned handle.
     ///
@@ -191,6 +211,27 @@ impl PosixHandle {
         } else {
             let err = libc::dlerror();
             Err(PosixLinkingError::clone_from_ptr(err))
+        }
+    }
+
+    pub unsafe fn lookup<T: pointersized::PointerSized>(
+        &self,
+        symbol: &str,
+    ) -> Result<PosixSymbol<'_, T>, PosixLinkingError> {
+        let symbol_bytes = symbol.as_bytes();
+
+        match ffi::CStr::from_bytes_until_nul(symbol_bytes) {
+            Ok(csymbol) => self.lookupc(csymbol),
+            Err(_) => {
+                const SYMBOL_ESTIMATED_MAX_LEN: usize = 4096;
+
+                let mut buf =
+                    smallvec::SmallVec::<[u8; SYMBOL_ESTIMATED_MAX_LEN]>::from_slice(symbol_bytes);
+                buf.push(0);
+
+                let csymbol = unsafe { ffi::CStr::from_bytes_with_nul_unchecked(&buf) };
+                self.lookupc(csymbol)
+            }
         }
     }
 
