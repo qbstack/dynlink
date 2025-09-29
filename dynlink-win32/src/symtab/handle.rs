@@ -1,6 +1,7 @@
-use std::{error, ffi, fmt};
+use std::{error, ffi, fmt, os::windows::ffi::OsStrExt};
 
 use pointersized::PointerSized;
+use smallvec;
 use windows_sys::Win32::{Foundation, System::LibraryLoader};
 
 use crate::{ffi::WCStr, symtab::Win32Symbol};
@@ -239,6 +240,18 @@ impl error::Error for Win32LinkingError {}
 pub struct Win32Handle(pub(super) *mut ffi::c_void);
 
 impl Win32Handle {
+    pub unsafe fn open(path: impl AsRef<ffi::OsStr>) -> Result<Self, Win32LinkingError> {
+        const PATH_ESTIMATED_MAX_LEN: usize = 4096;
+
+        let mut buf = smallvec::SmallVec::<[u16; PATH_ESTIMATED_MAX_LEN]>::from_iter(
+            path.as_ref().encode_wide().take_while(|it| *it != 0),
+        );
+        buf.push(0);
+
+        let wpath = unsafe { WCStr::from_wide_with_nul_unchecked(&buf) };
+        Self::openwc(wpath, 0)
+    }
+
     /// Opens shared object file specified by null-terminated `path` and loads it into the process address
     /// space according to `options` and returns an owned handle.
     ///
@@ -257,6 +270,27 @@ impl Win32Handle {
         } else {
             let err = Foundation::GetLastError();
             Err(Win32LinkingError::from_raw_code(err))
+        }
+    }
+
+    pub unsafe fn lookup<T: pointersized::PointerSized>(
+        &self,
+        symbol: &str,
+    ) -> Result<Win32Symbol<'_, T>, Win32LinkingError> {
+        let symbol_bytes = symbol.as_bytes();
+
+        match ffi::CStr::from_bytes_until_nul(symbol_bytes) {
+            Ok(csymbol) => self.lookupc(csymbol),
+            Err(_) => {
+                const SYMBOL_ESTIMATED_MAX_LEN: usize = 4096;
+
+                let mut buf =
+                    smallvec::SmallVec::<[u8; SYMBOL_ESTIMATED_MAX_LEN]>::from_slice(symbol_bytes);
+                buf.push(0);
+
+                let csymbol = unsafe { ffi::CStr::from_bytes_with_nul_unchecked(&buf) };
+                self.lookupc(csymbol)
+            }
         }
     }
 
