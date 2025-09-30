@@ -1,0 +1,14 @@
+use dynlink_win32::symtab::{Win32Handle, Win32LinkingError, Win32Symbol, Win32SystemCode};
+
+pub use dynlink_win32::symtab::{
+    LOAD_IGNORE_CODE_AUTHZ_LEVEL, LOAD_LIBRARY_AS_DATAFILE, LOAD_LIBRARY_AS_DATAFILE_EXCLUSIVE,
+    LOAD_LIBRARY_AS_IMAGE_RESOURCE, LOAD_LIBRARY_REQUIRE_SIGNED_TARGET,
+    LOAD_LIBRARY_SAFE_CURRENT_DIRS, LOAD_LIBRARY_SEARCH_APPLICATION_DIR,
+    LOAD_LIBRARY_SEARCH_DEFAULT_DIRS, LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR,
+    LOAD_LIBRARY_SEARCH_SYSTEM32, LOAD_LIBRARY_SEARCH_USER_DIRS, LOAD_WITH_ALTERED_SEARCH_PATH,
+};
+
+pub type PlatformHandle = Win32Handle;
+pub type PlatformSymbol<'symtab, T> = Win32Symbol<'symtab, T>;
+pub type PlatformLinkingError = Win32LinkingError;
+pub type PlatformMessage = Win32SystemCode;

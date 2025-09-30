@@ -13,6 +13,9 @@
 ))]
 mod unix;
 
+#[cfg(target_os = "windows")]
+mod windows;
+
 #[cfg(any(
     target_os = "linux",
     target_os = "android",
@@ -29,4 +32,14 @@ mod unix;
 pub use unix::{
     PlatformHandle, PlatformLinkingError, PlatformMessage, PlatformSymbol, RTLD_GLOBAL, RTLD_LAZY,
     RTLD_LOCAL, RTLD_NOW,
+};
+
+#[cfg(target_os = "windows")]
+pub use windows::{
+    PlatformHandle, PlatformLinkingError, PlatformMessage, PlatformSymbol,
+    LOAD_IGNORE_CODE_AUTHZ_LEVEL, LOAD_LIBRARY_AS_DATAFILE, LOAD_LIBRARY_AS_DATAFILE_EXCLUSIVE,
+    LOAD_LIBRARY_AS_IMAGE_RESOURCE, LOAD_LIBRARY_REQUIRE_SIGNED_TARGET,
+    LOAD_LIBRARY_SAFE_CURRENT_DIRS, LOAD_LIBRARY_SEARCH_APPLICATION_DIR,
+    LOAD_LIBRARY_SEARCH_DEFAULT_DIRS, LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR,
+    LOAD_LIBRARY_SEARCH_SYSTEM32, LOAD_LIBRARY_SEARCH_USER_DIRS, LOAD_WITH_ALTERED_SEARCH_PATH,
 };
