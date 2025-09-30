@@ -16,6 +16,22 @@ mod unix;
 #[cfg(target_os = "windows")]
 mod windows;
 
+#[cfg(not(any(
+    target_os = "linux",
+    target_os = "android",
+    target_os = "macos",
+    target_os = "ios",
+    target_os = "freebsd",
+    target_os = "openbsd",
+    target_os = "netbsd",
+    target_os = "dragonfly",
+    target_os = "solaris",
+    target_os = "illumos",
+    target_os = "haiku",
+    target_os = "windows"
+)))]
+mod noop;
+
 #[cfg(any(
     target_os = "linux",
     target_os = "android",
@@ -43,3 +59,19 @@ pub use windows::{
     LOAD_LIBRARY_SEARCH_DEFAULT_DIRS, LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR,
     LOAD_LIBRARY_SEARCH_SYSTEM32, LOAD_LIBRARY_SEARCH_USER_DIRS, LOAD_WITH_ALTERED_SEARCH_PATH,
 };
+
+#[cfg(not(any(
+    target_os = "linux",
+    target_os = "android",
+    target_os = "macos",
+    target_os = "ios",
+    target_os = "freebsd",
+    target_os = "openbsd",
+    target_os = "netbsd",
+    target_os = "dragonfly",
+    target_os = "solaris",
+    target_os = "illumos",
+    target_os = "haiku",
+    target_os = "windows"
+)))]
+pub use noop::{PlatformHandle, PlatformLinkingError, PlatformMessage, PlatformSymbol};
