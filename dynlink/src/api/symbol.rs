@@ -34,3 +34,21 @@ impl<'symtab, T: PointerSized> fmt::Debug for Symbol<'symtab, T> {
         f.write_fmt(format_args!("{:?})", self.0))
     }
 }
+
+#[cfg(test)]
+mod unittest {
+    use crate::api::Symbol;
+
+    pub fn assert_send<T: Send>() {}
+    pub fn assert_sync<T: Sync>() {}
+
+    #[test]
+    pub fn symbol_marked_as_send_test() {
+        assert_send::<Symbol<'_, fn(i32, i32) -> i32>>();
+    }
+
+    #[test]
+    pub fn symbol_marked_as_sync_test() {
+        assert_sync::<Symbol<'_, fn(i32, i32) -> i32>>();
+    }
+}
