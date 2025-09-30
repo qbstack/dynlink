@@ -77,3 +77,21 @@ impl fmt::Debug for Handle {
         f.write_fmt(format_args!("{:?}", self.0))
     }
 }
+
+#[cfg(test)]
+mod unittest {
+    use crate::api::Handle;
+
+    pub fn assert_send<T: Send>() {}
+    pub fn assert_sync<T: Sync>() {}
+
+    #[test]
+    pub fn handle_marked_as_send_test() {
+        assert_send::<Handle>();
+    }
+
+    #[test]
+    pub fn handle_marked_as_sync_test() {
+        assert_sync::<Handle>();
+    }
+}
