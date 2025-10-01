@@ -1,7 +1,7 @@
 [workspace.package]
-version = "0.0.0"
+version = "0.1.0"
 description = "Cross-platform dynamic linking"
-keywords = ["dynamic linking", "dynamic library", "dynlink", "dynlib"]
+keywords = ["dynlink", "dynlib"]
 authors = ["Ivan Kutuzov <ikutuzov.dev@gmail.com>", "qbstack contributors"]
 license = "MIT"
 readme = "README.md"
@@ -20,9 +20,9 @@ opt-level = 1
 opt-level = 3
 
 [workspace.dependencies]
-pointersized = { path = "pointersized" }
-dynlink-posix = { path = "dynlink-posix" }
-dynlink-win32 = { path = "dynlink-win32" }
+pointersized = { path = "pointersized", version = "0.1" }
+dynlink-posix = { path = "dynlink-posix", version = "0.1" }
+dynlink-win32 = { path = "dynlink-win32", version = "0.1" }
 
 # Shared dependencies
 smallvec = { version = "1.15" }
