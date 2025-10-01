@@ -9,7 +9,7 @@ use pointersized::PointerSized;
 /// `PosixSymbol` is used to access and use the functions or data it represents.
 ///
 /// ```no_run
-/// use dynlink_posix::symtab::{PosixHandle, PosixSymbol, RTLD_LAZY, RTLD_LOCAL};
+/// use dynlink_posix::symtab::{PosixHandle, PosixSymbol};
 ///
 /// // sum.c
 /// //
@@ -19,10 +19,10 @@ use pointersized::PointerSized;
 ///
 /// fn main() {
 ///     unsafe {
-///         let handle = PosixHandle::openc(c"libsum.so", RTLD_LOCAL | RTLD_LAZY)
+///         let handle = PosixHandle::open("libsum.so")
 ///             .expect("libsum handle was not opened");
 ///
-///         let symbol: PosixSymbol<'_, extern "C" fn(i32, i32) -> i32> = handle.lookupc(c"sum_of")
+///         let symbol: PosixSymbol<'_, extern "C" fn(i32, i32) -> i32> = handle.lookup("sum_of")
 ///             .expect("sum_of symbol was not found");
 ///
 ///         let sum = symbol.apply(|sum_of_fn| sum_of_fn(1, 1));

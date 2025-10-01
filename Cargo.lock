@@ -5,6 +5,11 @@ version = 4
 [[package]]
 name = "dynlink"
 version = "0.0.0"
+dependencies = [
+ "dynlink-posix",
+ "dynlink-win32",
+ "pointersized",
+]
 
 [[package]]
 name = "dynlink-posix"
@@ -12,6 +17,7 @@ version = "0.0.0"
 dependencies = [
  "libc",
  "pointersized",
+ "smallvec",
 ]
 
 [[package]]
@@ -19,6 +25,7 @@ name = "dynlink-win32"
 version = "0.0.0"
 dependencies = [
  "pointersized",
+ "smallvec",
  "windows-sys",
 ]
 
@@ -31,6 +38,12 @@ checksum = "58f929b4d672ea937a23a1ab494143d968337a5f47e56d0815df1e0890ddf174"
 [[package]]
 name = "pointersized"
 version = "0.0.0"
+
+[[package]]
+name = "smallvec"
+version = "1.15.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "67b1b7a3b5fe4f1376887184045fcf45c69e92af734b7aaddc05fb777b6fbd03"
 
 [[package]]
 name = "windows-link"

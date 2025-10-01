@@ -9,9 +9,7 @@ use pointersized::PointerSized;
 /// `Win32Symbol` is used to access and use the functions or data it represents.
 ///
 /// ```no_run
-/// use std::{ffi, os::windows::ffi::OsStrExt};
-///
-/// use dynlink_win32::{ffi::WCStr, symtab::{Win32Handle, Win32Symbol}};
+/// use dynlink_win32::symtab::{Win32Handle, Win32Symbol};
 ///
 /// // sum.c
 /// //
@@ -21,18 +19,10 @@ use pointersized::PointerSized;
 ///
 /// fn main() {
 ///     unsafe {
-///         let encoded = ffi::OsStr::new("libsum.dll")
-///             .encode_wide()
-///             .chain(Some(0))
-///             .collect::<Vec<u16>>();
-///
-///         let wpath = WCStr::from_wide_with_nul(&encoded)
-///             .expect("Unreachable");
-///
-///         let handle = Win32Handle::openwc(wpath, 0)
+///         let handle = Win32Handle::open("libsum.dll")
 ///             .expect("libsum handle was not opened");
 ///
-///         let symbol: Win32Symbol<'_, extern "C" fn(i32, i32) -> i32> = handle.lookupc(c"sum_of")
+///         let symbol: Win32Symbol<'_, extern "C" fn(i32, i32) -> i32> = handle.lookup("sum_of")
 ///             .expect("sum_of symbol was not found");
 ///
 ///         let sum = symbol.apply(|sum_of_fn| sum_of_fn(1, 1));
