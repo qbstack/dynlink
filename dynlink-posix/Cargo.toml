@@ -1,6 +1,6 @@
 [package]
 name = "dynlink-posix"
-version = { workspace = true }
+version = "0.1.0"
 description = "Cross-platform dynamic linking. Posix backend"
 keywords = { workspace = true }
 authors = { workspace = true }

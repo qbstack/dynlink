@@ -5,6 +5,14 @@ Cross-platform dynamic linking.
 This library provides a platform-independent API that allows dynamic linking
 shared objects, and use the data and functions they contains.
 
+- [Documentation](https://docs.rs/dynlink/latest/dynlink/)
+- [Changelog](https://github.com/qbstack/dynlink/blob/main/CHANGELOG.md)
+
+```toml
+[dependencies]
+dynlink = { version = "0.1.1" }
+```
+
 ## Usage
 
 With this library shared object functions can be used.

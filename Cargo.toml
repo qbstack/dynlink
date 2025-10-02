@@ -1,5 +1,4 @@
 [workspace.package]
-version = "0.1.0"
 description = "Cross-platform dynamic linking"
 keywords = ["dynlink", "dynlib"]
 authors = ["Ivan Kutuzov <ikutuzov.dev@gmail.com>", "qbstack contributors"]
