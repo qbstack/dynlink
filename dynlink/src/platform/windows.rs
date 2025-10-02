@@ -8,6 +8,8 @@ pub use dynlink_win32::symtab::{
     LOAD_LIBRARY_SEARCH_SYSTEM32, LOAD_LIBRARY_SEARCH_USER_DIRS, LOAD_WITH_ALTERED_SEARCH_PATH,
 };
 
+pub use dynlink_win32::ffi::{FromBytesUntilNulError, FromBytesWithNulError, WCStr};
+
 pub type PlatformHandle = Win32Handle;
 pub type PlatformSymbol<'symtab, T> = Win32Symbol<'symtab, T>;
 pub type PlatformLinkingError = Win32LinkingError;
