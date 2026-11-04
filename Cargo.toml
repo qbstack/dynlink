@@ -19,9 +19,9 @@ opt-level = 1
 opt-level = 3
 
 [workspace.dependencies]
-pointersized = { path = "pointersized", version = "0.1" }
-dynlink-posix = { path = "dynlink-posix", version = "0.1" }
-dynlink-win32 = { path = "dynlink-win32", version = "0.1" }
+pointersized = { path = "pointersized", version = "1.0" }
+dynlink-posix = { path = "dynlink-posix", version = "1.0" }
+dynlink-win32 = { path = "dynlink-win32", version = "1.0" }
 
 # Shared dependencies
 smallvec = { version = "1.15" }
