@@ -1,6 +1,6 @@
 [package]
 name = "dynlink"
-version = "0.1.1"
+version = "1.0.0"
 description = { workspace = true }
 keywords = { workspace = true }
 authors = { workspace = true }

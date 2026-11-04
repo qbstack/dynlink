@@ -10,7 +10,7 @@ shared objects, and use the data and functions they contains.
 
 ```toml
 [dependencies]
-dynlink = { version = "0.1.1" }
+dynlink = { version = "1.0.0" }
 ```
 
 ## Usage

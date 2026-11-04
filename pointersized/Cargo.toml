@@ -1,6 +1,6 @@
 [package]
 name = "pointersized"
-version = "0.1.0"
+version = "1.0.0"
 description = "Marking of pointer-sized types"
 keywords = { workspace = true }
 authors = { workspace = true }
