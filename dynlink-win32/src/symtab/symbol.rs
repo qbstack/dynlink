@@ -53,7 +53,7 @@ impl<'symtab, T: PointerSized> Win32Symbol<'symtab, T> {
     /// Type `T` must be ABI compatible with the type of symbol from a shared object.
     #[inline]
     pub unsafe fn apply<R>(&self, f: impl Fn(T) -> R) -> R {
-        f((&self.0 as *const *mut ffi::c_void).cast::<T>().read())
+        f(unsafe { (&self.0 as *const *mut ffi::c_void).cast::<T>().read() })
     }
 
     /// Leaks as the type it represents.
@@ -64,7 +64,7 @@ impl<'symtab, T: PointerSized> Win32Symbol<'symtab, T> {
     /// Type `T` must be ABI compatible with the type of symbol from a shared object.
     #[inline]
     pub unsafe fn leak(self) -> T {
-        (&self.0 as *const *mut ffi::c_void).cast::<T>().read()
+        unsafe { (&self.0 as *const *mut ffi::c_void).cast::<T>().read() }
     }
 
     /// Leaks as raw pointer.

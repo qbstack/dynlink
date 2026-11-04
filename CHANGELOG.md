@@ -5,6 +5,11 @@ Release notes.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Changed
+- Minimum supported Rust version is now 1.99.1
+- All crates now use the 2024 edition
+
 ## [0.1.1]
 ### Fixed
 - Windows platform now exports WCstr

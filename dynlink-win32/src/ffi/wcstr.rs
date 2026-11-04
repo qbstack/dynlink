@@ -140,7 +140,7 @@ impl WCStr {
     /// Provided `data` must be null-terminated and not contain any interior nulls.
     #[inline]
     pub const unsafe fn from_wide_with_nul_unchecked(data: &[u16]) -> &Self {
-        &*(data as *const [u16] as *const WCStr)
+        unsafe { &*(data as *const [u16] as *const WCStr) }
     }
 
     /// Wraps a raw [u16] data with a safe wide C string wrapper.
@@ -151,8 +151,10 @@ impl WCStr {
     /// data that not contain any interior nulls. Returned `WCStr` must not outlive the owner of data.
     #[inline]
     pub const unsafe fn from_ptr<'ws>(data: *const u16) -> &'ws Self {
-        let len = strlen(data);
-        Self::from_wide_with_nul_unchecked(slice::from_raw_parts(data.cast(), len + 1))
+        unsafe {
+            let len = strlen(data);
+            Self::from_wide_with_nul_unchecked(slice::from_raw_parts(data.cast(), len + 1))
+        }
     }
 
     /// Converts wide C string to a [u16] slice.
@@ -222,7 +224,7 @@ const unsafe fn strlen(data: *const u16) -> usize {
     let mut len = 0;
 
     loop {
-        if *data.add(len) == 0 {
+        if unsafe { *data.add(len) } == 0 {
             return len;
         }
 
