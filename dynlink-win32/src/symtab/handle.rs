@@ -279,7 +279,7 @@ impl Win32Handle {
         buf.push(0);
 
         let wpath = unsafe { WCStr::from_wide_with_nul_unchecked(&buf) };
-        Self::openwc(wpath, 0)
+        unsafe { Self::openwc(wpath, 0) }
     }
 
     /// Opens shared object file specified by null-terminated `path` and loads it into the process address
@@ -293,12 +293,13 @@ impl Win32Handle {
         path: &WCStr,
         options: LibraryLoader::LOAD_LIBRARY_FLAGS,
     ) -> Result<Self, Win32LinkingError> {
-        let handle = LibraryLoader::LoadLibraryExW(path.as_ptr(), 0 as *mut ffi::c_void, options);
+        let handle =
+            unsafe { LibraryLoader::LoadLibraryExW(path.as_ptr(), 0 as *mut ffi::c_void, options) };
 
         if !handle.is_null() {
             Ok(Self(handle))
         } else {
-            let err = Foundation::GetLastError();
+            let err = unsafe { Foundation::GetLastError() };
             Err(Win32LinkingError::from_raw_code(err))
         }
     }
@@ -315,7 +316,7 @@ impl Win32Handle {
         let symbol_bytes = symbol.as_bytes();
 
         match ffi::CStr::from_bytes_until_nul(symbol_bytes) {
-            Ok(csymbol) => self.lookupc(csymbol),
+            Ok(csymbol) => unsafe { self.lookupc(csymbol) },
             Err(_) => {
                 const SYMBOL_ESTIMATED_MAX_LEN: usize = 4096;
 
@@ -324,7 +325,7 @@ impl Win32Handle {
                 buf.push(0);
 
                 let csymbol = unsafe { ffi::CStr::from_bytes_with_nul_unchecked(&buf) };
-                self.lookupc(csymbol)
+                unsafe { self.lookupc(csymbol) }
             }
         }
     }
@@ -338,12 +339,12 @@ impl Win32Handle {
         &self,
         symbol: &ffi::CStr,
     ) -> Result<Win32Symbol<'_, T>, Win32LinkingError> {
-        let ptr = LibraryLoader::GetProcAddress(self.0, symbol.as_ptr() as *const u8);
+        let ptr = unsafe { LibraryLoader::GetProcAddress(self.0, symbol.as_ptr() as *const u8) };
 
         match ptr {
-            Some(addr) => Ok(Win32Symbol::from_ptr(addr as *mut ffi::c_void)),
+            Some(addr) => Ok(unsafe { Win32Symbol::from_ptr(addr as *mut ffi::c_void) }),
             None => {
-                let err = Foundation::GetLastError();
+                let err = unsafe { Foundation::GetLastError() };
                 Err(Win32LinkingError::from_raw_code(err))
             }
         }

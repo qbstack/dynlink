@@ -47,7 +47,7 @@ impl<'symtab, T: PointerSized> Symbol<'symtab, T> {
     /// Type `T` must be ABI compatible with the type of symbol from a shared object.
     #[inline]
     pub unsafe fn apply<R>(&self, f: impl Fn(T) -> R) -> R {
-        self.0.apply(f)
+        unsafe { self.0.apply(f) }
     }
 
     /// Leaks as the type it represents.
@@ -58,7 +58,7 @@ impl<'symtab, T: PointerSized> Symbol<'symtab, T> {
     /// Type `T` must be ABI compatible with the type of symbol from a shared object.
     #[inline]
     pub unsafe fn leak(self) -> T {
-        self.0.leak()
+        unsafe { self.0.leak() }
     }
 
     /// Leaks as raw pointer.
@@ -68,7 +68,7 @@ impl<'symtab, T: PointerSized> Symbol<'symtab, T> {
     /// Returning pointer must not outlive the handle that owns it.
     #[inline]
     pub unsafe fn leak_as_raw(self) -> *mut ffi::c_void {
-        self.0.leak_as_raw()
+        unsafe { self.0.leak_as_raw() }
     }
 }
 

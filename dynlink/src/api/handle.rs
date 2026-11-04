@@ -102,7 +102,7 @@ impl Handle {
     /// Shared object initialization routines that are executed when this
     /// function is called may be UB.
     pub unsafe fn open(path: impl AsRef<ffi::OsStr>) -> Result<Self, LinkingError> {
-        match PlatformHandle::open(path) {
+        match unsafe { PlatformHandle::open(path) } {
             Ok(handle) => Ok(Self(handle)),
             Err(err) => Err(LinkingError::from(err)),
         }
@@ -117,7 +117,7 @@ impl Handle {
         &self,
         symbol: &str,
     ) -> Result<Symbol<'_, T>, LinkingError> {
-        match self.0.lookup(symbol) {
+        match unsafe { self.0.lookup(symbol) } {
             Ok(symbol) => Ok(Symbol(symbol)),
             Err(err) => Err(LinkingError::from(err)),
         }

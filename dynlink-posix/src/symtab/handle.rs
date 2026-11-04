@@ -96,7 +96,7 @@ impl PosixLinkingError {
     /// Creates owned error cloned from raw c-str pointer.
     pub(super) unsafe fn clone_from_ptr(msg: *const ffi::c_char) -> Self {
         if !msg.is_null() {
-            Self::clone_from_str(ffi::CStr::from_ptr(msg))
+            Self::clone_from_str(unsafe { ffi::CStr::from_ptr(msg) })
         } else {
             Self::Unknown
         }
@@ -206,7 +206,7 @@ impl PosixHandle {
         let options = RTLD_LAZY | RTLD_LOCAL;
 
         match ffi::CStr::from_bytes_until_nul(path_bytes) {
-            Ok(cpath) => Self::openc(cpath, options),
+            Ok(cpath) => unsafe { Self::openc(cpath, options) },
             Err(_) => {
                 const PATH_ESTIMATED_MAX_LEN: usize = 4096;
 
@@ -215,7 +215,7 @@ impl PosixHandle {
                 buf.push(0);
 
                 let cpath = unsafe { ffi::CStr::from_bytes_with_nul_unchecked(&buf) };
-                Self::openc(cpath, options)
+                unsafe { Self::openc(cpath, options) }
             }
         }
     }
@@ -229,15 +229,15 @@ impl PosixHandle {
     /// function is called may be UB.
     pub unsafe fn openc(path: &ffi::CStr, options: ffi::c_int) -> Result<Self, PosixLinkingError> {
         #[cfg(target_os = "freebsd")]
-        let _ = libc::dlerror();
+        let _ = unsafe { libc::dlerror() };
 
-        let handle = libc::dlopen(path.as_ptr(), options);
+        let handle = unsafe { libc::dlopen(path.as_ptr(), options) };
 
         if !handle.is_null() {
             Ok(Self(handle))
         } else {
-            let err = libc::dlerror();
-            Err(PosixLinkingError::clone_from_ptr(err))
+            let err = unsafe { libc::dlerror() };
+            Err(unsafe { PosixLinkingError::clone_from_ptr(err) })
         }
     }
 
@@ -253,7 +253,7 @@ impl PosixHandle {
         let symbol_bytes = symbol.as_bytes();
 
         match ffi::CStr::from_bytes_until_nul(symbol_bytes) {
-            Ok(csymbol) => self.lookupc(csymbol),
+            Ok(csymbol) => unsafe { self.lookupc(csymbol) },
             Err(_) => {
                 const SYMBOL_ESTIMATED_MAX_LEN: usize = 4096;
 
@@ -262,7 +262,7 @@ impl PosixHandle {
                 buf.push(0);
 
                 let csymbol = unsafe { ffi::CStr::from_bytes_with_nul_unchecked(&buf) };
-                self.lookupc(csymbol)
+                unsafe { self.lookupc(csymbol) }
             }
         }
     }
@@ -277,9 +277,9 @@ impl PosixHandle {
         symbol: &ffi::CStr,
     ) -> Result<PosixSymbol<'_, T>, PosixLinkingError> {
         #[cfg(target_os = "freebsd")]
-        let _ = libc::dlerror();
+        let _ = unsafe { libc::dlerror() };
 
-        let ptr = libc::dlsym(self.0, symbol.as_ptr());
+        let ptr = unsafe { libc::dlsym(self.0, symbol.as_ptr()) };
 
         #[cfg(any(
             target_os = "linux",
@@ -294,22 +294,22 @@ impl PosixHandle {
             target_os = "haiku",
         ))]
         if !ptr.is_null() {
-            Ok(PosixSymbol::from_ptr(ptr))
+            Ok(unsafe { PosixSymbol::from_ptr(ptr) })
         } else {
-            let err = libc::dlerror();
+            let err = unsafe { libc::dlerror() };
             if err.is_null() {
-                Ok(PosixSymbol::from_ptr(ptr))
+                Ok(unsafe { PosixSymbol::from_ptr(ptr) })
             } else {
-                Err(PosixLinkingError::clone_from_ptr(err))
+                Err(unsafe { PosixLinkingError::clone_from_ptr(err) })
             }
         }
 
         #[cfg(target_os = "freebsd")]
         if !ptr.is_null() {
-            Ok(PosixSymbol::from_ptr(ptr))
+            Ok(unsafe { PosixSymbol::from_ptr(ptr) })
         } else {
-            let err = libc::dlerror();
-            Err(PosixLinkingError::clone_from_ptr(err))
+            let err = unsafe { libc::dlerror() };
+            Err(unsafe { PosixLinkingError::clone_from_ptr(err) })
         }
     }
 }

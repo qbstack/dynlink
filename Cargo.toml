@@ -5,8 +5,8 @@ authors = ["Ivan Kutuzov <ikutuzov.dev@gmail.com>", "qbstack contributors"]
 license = "MIT"
 readme = "README.md"
 repository = "https://github.com/qbstack/dynlink"
-rust-version = "1.89"
-edition = "2021"
+rust-version = "1.99.1"
+edition = "2024"
 
 [workspace]
 resolver = "3"
